@@ -64,7 +64,7 @@ function toggleCategory(category) {
   document.getElementById('jewelry-options').style.display = 'none';
 }
 
-// Select a jewelry type (earrings/necklaces) and load options from Drive
+// Select a jewelry type (earrings/necklaces) and load options from Drive (via proxy)
 async function selectJewelryType(type) {
   currentType = type;
   const container = document.getElementById('jewelry-options');
@@ -86,7 +86,9 @@ async function selectJewelryType(type) {
     for (const item of items) {
       const btn = document.createElement('button');
       const img = document.createElement('img');
-      img.src = item.thumb || item.link; // thumbnail for option tray
+
+      // Use proxy link for menu thumbnails + overlays
+      img.src = item.link;
       img.alt = item.name;
       btn.appendChild(img);
 
@@ -184,7 +186,7 @@ function takeSnapshot() {
     document.getElementById('snapshot-modal').style.display = 'block';
   } catch (e) {
     console.error(e);
-    alert("Snapshot failed (Google Drive images may block CORS). Try Firebase or GitHub for images if needed.");
+    alert("Snapshot failed. Check if images are loading correctly.");
   }
 }
 
