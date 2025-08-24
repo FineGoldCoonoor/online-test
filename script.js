@@ -1,5 +1,5 @@
 // === Drive API endpoint from your Apps Script deployment ===
-const DRIVE_API_URL = 'https://script.google.com/macros/s/AKfycbyHVOriK2qu99zk8VW7j88z8k2Jm2EJ5UwALVteW9h4sWAWFyyvTiU87EXIc5F3mH8/exec';
+const DRIVE_API_URL = 'https://script.google.com/macros/s/AKfycbwYeLvUfYaczIQa1bWUlbDeZnU65YZyFXbkkZMJmNXe28OePSnHxA0ZJhc-vXwnfRri/exec';
 const driveCache = new Map();
 
 // === Existing DOM refs ===
@@ -7,7 +7,6 @@ const videoElement = document.getElementById('webcam');
 const canvasElement = document.getElementById('overlay');
 const canvasCtx = canvasElement.getContext('2d');
 
-let currentMode = null;
 let earringImg = null;
 let necklaceImg = null;
 let earringSrc = '';
@@ -16,12 +15,13 @@ let lastSnapshotDataURL = '';
 let currentType = '';
 let smoothedLandmarks = null;
 
-// Load an image (with CORS handling for snapshots)
+// Load an image (with CORS handling for snapshots, via proxy)
 function loadImage(src) {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = src;
+    // Force load via proxy API
+    img.src = `${DRIVE_API_URL}?fileId=${encodeURIComponent(src)}&proxy=1`;
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null);
   });
@@ -87,16 +87,16 @@ async function selectJewelryType(type) {
       const btn = document.createElement('button');
       const img = document.createElement('img');
 
-      // Use proxy link for menu thumbnails + overlays
-      img.src = item.link;
+      // Use API proxy for menu thumbnails
+      img.src = `${DRIVE_API_URL}?fileId=${encodeURIComponent(item.id)}&proxy=1`;
       img.alt = item.name;
       btn.appendChild(img);
 
       btn.onclick = () => {
         if (type.includes('earrings')) {
-          changeEarring(item.link);
+          changeEarring(item.id);
         } else {
-          changeNecklace(item.link);
+          changeNecklace(item.id);
         }
       };
 
